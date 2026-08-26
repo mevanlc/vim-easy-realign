@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+: "${PREFIX:?PREFIX must point to the Termux installation prefix}"
+
+test_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+plugin_dir=$(CDPATH= cd -- "$test_dir/.." && pwd)
+easy_align_dir=$(CDPATH= cd -- "$plugin_dir/../vim-easy-align" && pwd)
+
+EASY_REALIGN_ROOT=$plugin_dir \
+EASY_ALIGN_ROOT=$easy_align_dir \
+  "$PREFIX/bin/vim" -Nu NONE -n -es -i NONE \
+  -S "$test_dir/easy_realign.vim"

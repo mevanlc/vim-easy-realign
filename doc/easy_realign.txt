@@ -1,0 +1,88 @@
+*easy_realign.txt*	Reapply EasyAlign specifications stored in regions
+
+==============================================================================
+CONTENTS                                                     *easy-realign*
+
+  1. Introduction...............................|easy-realign-introduction|
+  2. Markers............................................|easy-realign-markers|
+  3. Commands..........................................|easy-realign-commands|
+  4. Mappings..........................................|easy-realign-mappings|
+  5. Errors and safety............................|easy-realign-errors-safety|
+
+==============================================================================
+1. INTRODUCTION                                  *easy-realign-introduction*
+
+vim-easy-realign stores non-interactive |:EasyAlign| specifications in paired
+comment markers and reapplies them on demand. It requires vim-easy-align and
+does not realign automatically.
+
+==============================================================================
+2. MARKERS                                              *easy-realign-markers*
+
+An opening marker contains an EasyAlign specification. The body lies between
+the marker lines, which are never included in the alignment range: >
+
+  # :>>:EasyAlign /\S\+\ze=/l1r0
+  alias l='command'
+  alias ll='command'
+  # :<<:EasyAlign
+<
+Use `EasyAlign!` on the opening marker to invoke the bang form. Specifications
+must be complete and non-interactive; an occurrence and delimiter or regular
+expression target is required.
+
+The supported comment leaders are: >
+
+  #  "  //  --  ;  %
+<
+Optional indentation and whitespace after the leader are accepted. The closing
+marker must use the same leader. Regions must have at least one body line and
+may not nest. Marker names and command names are case-sensitive.
+
+Block-comment wrappers, multiline specifications, and configurable marker
+patterns are not supported.
+
+==============================================================================
+3. COMMANDS                                             *easy-realign-commands*
+
+                                                        *:EasyRealign*
+:EasyRealign
+        Realign the region containing the cursor. The opening marker, every
+        body line, and the closing marker all count as being inside the region.
+
+                                                        *:EasyRealignAll*
+:EasyRealignAll
+        Realign every marked region in the current buffer from top to bottom,
+        using each region's own specification.
+
+Before editing, each command parses the entire buffer and runs its requested
+alignment operations in an isolated copy. The real buffer changes only after
+every operation succeeds, and the complete result is one undo step. Cursor and
+view state and the previous |g:easy_align_last_command| are preserved.
+
+==============================================================================
+4. MAPPINGS                                             *easy-realign-mappings*
+
+The plugin installs no default keys. It provides these Normal-mode targets: >
+
+  <Plug>(EasyRealign)
+  <Plug>(EasyRealignAll)
+<
+For example: >
+
+  nmap <Leader>ar <Plug>(EasyRealign)
+  nmap <Leader>aR <Plug>(EasyRealignAll)
+<
+==============================================================================
+5. ERRORS AND SAFETY                               *easy-realign-errors-safety*
+
+Commands fail without changing the real buffer when markers are malformed,
+nested, unpaired, empty, or use mismatched comment leaders; when an EasyAlign
+specification is invalid; when the cursor is outside a region; when the buffer
+is not modifiable; or when |:EasyAlign| is unavailable.
+
+Region specifications are passed to EasyAlign. EasyAlign's dictionary option
+form accepts Vim expressions, so invoke these commands only in trusted files.
+
+==============================================================================
+vim:tw=78:et:ft=help:norl:
